@@ -1,31 +1,31 @@
 export const mintNFT = 
 `
-// REPLACE THIS WITH YOUR CONTRACT NAME + ADDRESS
-import BottomShot from 0x7b6adb682517f137 
-// This remains the same 
-import NonFungibleToken from 0x631e88ae7f1d7c20
+import BottomShot from 0x751a0eda3f2d16d4
+import NonFungibleToken from 0x751a0eda3f2d16d4
 
 transaction(
-  recipient: Address,
-  name: String,
-  description: String,
-  thumbnail: String,
+    recipient: Address,
+    name: String,
+    description: String,
+    thumbnail: String,
 ) {
   prepare(signer: AuthAccount) {
+    // Check if the user sending the transaction has a collection
     if signer.borrow<&BottomShot.Collection>(from: BottomShot.CollectionStoragePath) != nil {
-      return
+        // If they do, we move on to the execute stage
+        return
     }
 
-    // Create a new empty collection
+    // If they don't, we create a new empty collection
     let collection <- BottomShot.createEmptyCollection()
 
-    // save it to the account
+    // Save it to the account
     signer.save(<-collection, to: BottomShot.CollectionStoragePath)
 
-    // create a public capability for the collection
+    // Create a public capability for the collection
     signer.link<&{NonFungibleToken.CollectionPublic}>(
-      BottomShot.CollectionPublicPath,
-      target: BottomShot.CollectionStoragePath
+        BottomShot.CollectionPublicPath,
+        target: BottomShot.CollectionStoragePath
     )
   }
 
@@ -33,19 +33,19 @@ transaction(
   execute {
     // Borrow the recipient's public NFT collection reference
     let receiver = getAccount(recipient)
-      .getCapability(BottomShot.CollectionPublicPath)
-      .borrow<&{NonFungibleToken.CollectionPublic}>()
-      ?? panic("Could not get receiver reference to the NFT Collection")
+        .getCapability(BottomShot.CollectionPublicPath)
+        .borrow<&{NonFungibleToken.CollectionPublic}>()
+        ?? panic("Could not get receiver reference to the NFT Collection")
 
     // Mint the NFT and deposit it to the recipient's collection
     BottomShot.mintNFT(
-      recipient: receiver,
-      name: name,
-      description: description,
-      thumbnail: thumbnail,
+        recipient: receiver,
+        name: name,
+        description: description,
+        thumbnail: thumbnail,
     )
-    
+
     log("Minted an NFT and stored it into the collection")
-  } 
+  }
 }
 `

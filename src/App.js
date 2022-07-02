@@ -50,13 +50,19 @@ function App() {
         );
     };
 
-    const mint = async () => {
+    const mint = async() => {
+
         let _totalSupply;
         try {
-            _totalSupply = await fcl.query(
-                {cadence: `${getTotalSupply}`}
-            )
-            const _id = parseInt(_totalSupply) + 1;
+            _totalSupply = await fcl.query({
+                cadence: `${getTotalSupply}`
+            })
+        } catch(err) {console.log(err)}
+
+        const _id = parseInt(_totalSupply) + 1;
+        console.log(_id)
+
+        try {
             const transactionId = await fcl.mutate({
                 cadence: `${mintNFT}`,
                 args: (arg, t) => [
@@ -74,9 +80,10 @@ function App() {
             const transaction = await fcl.tx(transactionId).onceSealed();
             console.log("Testnet explorer link:", `https://testnet.flowscan.org/transaction/${transactionId}`);
             console.log(transaction);
-        } catch (e) {
+            alert("NFT minted successfully!")
+        } catch (error) {
+            console.log(error);
             alert("Error minting NFT, please check the console for error details!")
-            console.error(e);
         }
     }
 
