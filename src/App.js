@@ -1,13 +1,65 @@
 //importing required libraries
 import React, { useState, useEffect } from "react";
 import './App.css';
+import * as fcl from "@onflow/fcl";
+import * as types from "@onflow/types";
+
 import twitterLogo from "./assets/twitter-logo.svg";
 
 
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
+
+
+
+fcl.config({
+    "flow.network": "testnet",
+    "app.detail.title": "BottomShot", // Change the title!
+    "accessNode.api": "https://rest-testnet.onflow.org",
+    "app.detail.icon": "https://placekitten.com/g/200/200",
+    "discovery.wallet": "https://fcl-discovery.onflow.org/testnet/authn",
+});
 function App() {
+    const [ user, setUser ] = useState();
+
+    const logIn = () => {
+        fcl.authenticate();
+    };
+
+    const logOut = () => {
+        fcl.unauthenticate();
+    };
+
+    useEffect(() => {
+        // This listens to changes in the user objects
+        // and updates the connected user
+        fcl.currentUser().subscribe(setUser);
+    }, [])
+
+    const RenderLogin = () => {
+        return (
+            <div>
+                <button className="cta-button button-glow" onClick={() => logIn()}>
+                    Log In
+                </button>
+            </div>
+        );
+    };
+
+    const RenderLogout = () => {
+        if (user && user.addr) {
+            return (
+                <div className="logout-container">
+                    <button className="cta-button logout-btn" onClick={() => logOut()}>
+                        ❎ {"  "}
+                        {user.addr.substring(0, 6)}...{user.addr.substring(user.addr.length - 4)}
+                    </button>
+                </div>
+            );
+        }
+        return undefined;
+    };
 
   return (
     <div className="App">
@@ -20,6 +72,8 @@ function App() {
 
           <p className="sub-text">The easiest NFT mint experience ever!</p>
         </div>
+
+          {user && user.addr ? "Wallet connected!" : <RenderLogin />}
 
         <div className="footer-container">
             <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
