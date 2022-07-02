@@ -6,6 +6,9 @@ import * as types from "@onflow/types";
 
 import twitterLogo from "./assets/twitter-logo.svg";
 
+import { mintNFT } from "./cadence/transactions/mintNFT_tx";
+import { getTotalSupply } from "./cadence/scripts/getTotalSupply_script";
+
 
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -47,6 +50,36 @@ function App() {
         );
     };
 
+    const mint = async () => {
+        let _totalSupply;
+        try {
+            _totalSupply = await fcl.query(
+                {cadence: `${getTotalSupply}`}
+            )
+            const _id = parseInt(_totalSupply) + 1;
+            const transactionId = await fcl.mutate({
+                cadence: `${mintNFT}`,
+                args: (arg, t) => [
+                    arg(user.addr, types.Address), //address to which the NFT should be minted
+                    arg('Animal #' + _id, types.String),
+                    arg('Pet Animals you can have right now' + _id, types.String),
+                    arg('https://bafybeidhj3m6fn4ppoa3w66tcr746dalj6peknqhpdob32gls5bqcyouy4.ipfs.nftstorage.link/' + (_id + 2) + '.jpg', types.String),
+
+                ],
+                proposer: fcl.currentUser,
+                payer: fcl.currentUser,
+                limit: 99
+            })
+            console.log("Minting NFT now with transaction ID", transactionId);
+            const transaction = await fcl.tx(transactionId).onceSealed();
+            console.log("Testnet explorer link:", `https://testnet.flowscan.org/transaction/${transactionId}`);
+            console.log(transaction);
+        } catch (e) {
+            alert("Error minting NFT, please check the console for error details!")
+            console.error(e);
+        }
+    }
+
     const RenderLogout = () => {
         if (user && user.addr) {
             return (
@@ -61,6 +94,16 @@ function App() {
         return undefined;
     };
 
+    const RenderMintButton = () => {
+        return (
+            <div>
+                <button className="cta-button button-glow" onClick={() => mint()}>
+                    Mint
+                </button>
+            </div>
+        );
+    }
+
   return (
     <div className="App">
       <div className="container">
@@ -73,7 +116,7 @@ function App() {
           <p className="sub-text">The easiest NFT mint experience ever!</p>
         </div>
 
-          {user && user.addr ? "Wallet connected!" : <RenderLogin />}
+          {user && user.addr ? <RenderMintButton /> : <RenderLogin />}
 
         <div className="footer-container">
             <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
