@@ -1,11 +1,11 @@
-# buildspace Flow NFT Collection
+# Flow NFT Collection
 
-### **Welcome 👋**
-To get started with this course, clone this repo and follow these commands:
+onflow cadence NFT Collection Frontend
 
-1. Run `npm install` at the root of your directory
-2. Run `npm run start` to start the project
-3. Start coding!
+React Application include minting and retrieving the metadata of the NFT
 
-### **Questions?**
-Have some questions make sure you head over to your [buildspace Dashboard](https://buildspace.so/p/nfts-on-flow) and link your Discord account so you can get access to helpful channels and your instructor!
+Includes Javascript to retrieve the details from Cadence Smart contracts
+
+
+-- Buildspace Projects
+-- BitBucket Migration
