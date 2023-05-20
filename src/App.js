@@ -172,12 +172,22 @@ function App() {
     }
 
     useEffect(() => {
-        fcl.currentUser().subscribe(setUser);
+        fcl.currentUser().subscribe(data => {
+            setUser(data)
+            console.log(data);
+        });
         window.addEventListener("message", d => {
             // This only works for Lilico testnet to mainnet changes
-            if(d.data.type==='LILICO:NETWORK') setNetwork(d.data.network)
+            if (d.data.type === 'LILICO:NETWORK') {
+                setNetwork(d.data.network)
+            }
         })
     }, [])
+
+    useEffect(() => {
+        logOut();
+        logIn();
+    }, [network])
 
     useEffect(() => {
             if (user && user.addr) {
